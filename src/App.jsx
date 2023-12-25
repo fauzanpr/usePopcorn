@@ -72,35 +72,29 @@ function Search() {
   );
 }
 
-function MovieCount() {
+function MovieCount({ movies }) {
   return (
     <p className="num-results">
-      Found <strong>X</strong> results
+      Found <strong>{movies.length}</strong> results
     </p>
   );
 }
 
-function Navbar() {
+function Navbar({ children }) {
   return (
     <nav className="nav-bar">
       <Logo />
       <Search />
-      <MovieCount />
+      {children}
     </nav>
   );
 }
 
-function Main() {
-  return (
-    <main className="main">
-      <MovieListBox />
-      <MovieWatchedBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
-function MovieListBox() {
-  const [movies, setMovies] = useState(tempMovieData);
+function MovieListBox({ children }) {
   const [isOpen1, setIsOpen1] = useState(true);
   return (
     <div className="box">
@@ -110,13 +104,7 @@ function MovieListBox() {
       >
         {isOpen1 ? "–" : "+"}
       </button>
-      {isOpen1 && (
-        <ul className="list">
-          {movies?.map((movie) => (
-            <MovieCard movie={movie} key={movie.imdbID} />
-          ))}
-        </ul>
-      )}
+      {isOpen1 && children}
     </div>
   );
 }
@@ -136,8 +124,7 @@ function MovieCard({ movie }) {
   );
 }
 
-function MovieWatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
+function MovieWatchedBox({ children }) {
   const [isOpen2, setIsOpen2] = useState(true);
   return (
     <div className="box">
@@ -147,16 +134,7 @@ function MovieWatchedBox() {
       >
         {isOpen2 ? "–" : "+"}
       </button>
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <ul className="list">
-            {watched.map((movie) => (
-              <WatchedList movie={movie} key={movie.imdbID} />
-            ))}
-          </ul>
-        </>
-      )}
+      {isOpen2 && <>{children}</>}
     </div>
   );
 }
@@ -214,10 +192,30 @@ function WatchedSummary({ watched }) {
 }
 
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
   return (
     <>
-      <Navbar />
-      <Main />
+      <Navbar>
+        <MovieCount movies={movies} />
+      </Navbar>
+      <Main>
+        <MovieListBox>
+          <ul className="list">
+            {movies?.map((movie) => (
+              <MovieCard movie={movie} key={movie.imdbID} />
+            ))}
+          </ul>
+        </MovieListBox>
+        <MovieWatchedBox>
+          <WatchedSummary watched={watched} />
+          <ul className="list">
+            {watched.map((movie) => (
+              <WatchedList movie={movie} key={movie.imdbID} />
+            ))}
+          </ul>
+        </MovieWatchedBox>
+      </Main>
     </>
   );
 }
